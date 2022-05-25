@@ -4,6 +4,7 @@ on: [pull_request]
 
 jobs:
     build:
+        timeout-minutes: 5
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v3
@@ -14,6 +15,7 @@ jobs:
             - run: |
                   npm pack
     test:
+        timeout-minutes: 5
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v3
@@ -25,6 +27,7 @@ jobs:
                   npm run test
 
     dependencies:
+        timeout-minutes: 5
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v3
