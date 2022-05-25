@@ -1,0 +1,23 @@
+tasks:
+    - init: |
+          npm install -g npm
+          npm install
+      command: |
+          npm install -g npm eslint prettier
+
+gitConfig:
+    alias.co: checkout
+    alias.ci: commit
+    alias.amend: 'commit --amend --reset-author --no-edit'
+    core.autocrlf: input
+    core.whitespace: blank-at-eol,blank-at-eof,indent-with-tab
+    pull.rebase: 'false'
+
+vscode:
+    extensions:
+        - dbaeumer.vscode-eslint
+        - esbenp.prettier-vscode
+        - eamodio.gitlens
+        - eg2.vscode-npm-script
+        - bpruitt-goddard.mermaid-markdown-syntax-highlighting
+        - bierner.markdown-mermaid

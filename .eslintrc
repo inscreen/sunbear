@@ -1,0 +1,54 @@
+{
+    "parser": "@typescript-eslint/parser",
+    "extends": ["plugin:@typescript-eslint/recommended"],
+    "plugins": ["import"],
+    "parserOptions": {
+        "ecmaVersion": 2021,
+        "sourceType": "module",
+        "project": "./tsconfig.json"
+    },
+    "rules": {
+        "no-console": ["error"],
+        "semi": ["warn", "always"],
+        "quotes": [
+            "warn",
+            "single",
+            {
+                "avoidEscape": true
+            }
+        ],
+        "no-redeclare": "off",
+        "import/newline-after-import": ["error", { "count": 1 }],
+        "import/first": "error",
+        "import/order": [
+            "error",
+            {
+                "alphabetize": { "order": "asc", "caseInsensitive": true },
+                "groups": ["builtin", "external", "parent", "sibling", "index"],
+                "newlines-between": "always"
+            }
+        ],
+        "import/no-duplicates": "error",
+        "@typescript-eslint/strict-boolean-expressions": "warn",
+        "@typescript-eslint/no-redeclare": "error",
+        "@typescript-eslint/no-explicit-any": 1,
+        "@typescript-eslint/no-inferrable-types": [
+            "warn",
+            {
+                "ignoreParameters": true
+            }
+        ],
+        "@typescript-eslint/await-thenable": "error",
+        "@typescript-eslint/explicit-module-boundary-types": "warn",
+        "@typescript-eslint/no-unused-vars": [
+            "warn",
+            {
+                "varsIgnorePattern": "^_",
+                "argsIgnorePattern": "^_"
+            }
+        ],
+        "@typescript-eslint/no-misused-promises": "error",
+        "@typescript-eslint/no-floating-promises": "error",
+        "@typescript-eslint/no-non-null-assertion": "off"
+    }
+}
