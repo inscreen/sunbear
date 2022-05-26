@@ -75,7 +75,7 @@ export type Rule<Node, Relation, Role> = RuleDirect<Node, Relation, Role> | Rule
 
 export interface Schema<Node, Relation, Role, Permission extends string> {
     nodes: readonly { node: Node; tableName: string; primaryColumn: string }[];
-    grants: Map<Node, Record<Permission, Role[]>>;
+    grants: Map<Node, Partial<Record<Permission, Role[]>>>;
     edges: readonly Edge<Node, Relation>[];
     rules: readonly Rule<Node, Relation, Role>[];
 }

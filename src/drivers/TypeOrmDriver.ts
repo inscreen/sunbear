@@ -1,5 +1,5 @@
 import format from 'pg-format';
-import type { BaseEntity, DataSource, ObjectType, SelectQueryBuilder } from 'typeorm';
+import type { BaseEntity, Connection, ObjectType, SelectQueryBuilder } from 'typeorm';
 
 import type { Schema } from '..';
 import type { Driver } from '../Driver';
@@ -8,7 +8,7 @@ import type { PlannedQuery } from '../queryPlan';
 
 export class TypeOrmDriver<
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        Node extends BaseEntity & ObjectType<any>,
+        Node extends typeof BaseEntity & ObjectType<any>,
         Relation,
         Role,
         Permission extends string,
@@ -18,7 +18,7 @@ export class TypeOrmDriver<
 {
     constructor(
         private readonly schema: Schema<Node, Relation, Role, Permission>,
-        private readonly dataSource: DataSource,
+        private readonly dataSource: Connection,
     ) {
         if (!['postgres', 'aurora-postgres'].includes(dataSource.driver.options.type)) {
             throw new Error('SunBear: TypeOrmDriver only supports PostgreSQL');
