@@ -43,11 +43,13 @@ export const simpleOwnershipSchema: Schema<typeof nodes[number]['node'], Relatio
     ],
     rules: [
         {
+            kind: 'direct',
             node: Car,
             role: 'Stranger',
             actorNode: Person,
         },
         {
+            kind: 'direct',
             node: Car,
             role: 'Owner',
             actorNode: Person,

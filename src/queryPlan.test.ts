@@ -11,6 +11,7 @@ describe('queryPlan', () => {
                     actorId: undefined,
                     goalIds: ['car1', 'car2'],
                     direct: {
+                        kind: 'direct',
                         actorNode: Person,
                         node: Car,
                         role: 'Stranger',
@@ -21,6 +22,7 @@ describe('queryPlan', () => {
                     actorId: undefined,
                     goalIds: undefined,
                     direct: {
+                        kind: 'direct',
                         actorNode: Person,
                         node: Car,
                         role: 'Owner',
@@ -62,6 +64,7 @@ describe('queryPlan', () => {
                     actorId: 'user14',
                     goalIds: undefined,
                     direct: {
+                        kind: 'direct',
                         node: Membership,
                         role: 'Member',
                         actorNode: User,
@@ -69,6 +72,7 @@ describe('queryPlan', () => {
                     },
                     extensions: [
                         {
+                            kind: 'extension',
                             node: Project,
                             role: 'Member',
                             actorNode: User,
@@ -84,6 +88,7 @@ describe('queryPlan', () => {
                     actorId: 'user14',
                     goalIds: undefined,
                     direct: {
+                        kind: 'direct',
                         node: Project,
                         role: 'Owner',
                         actorNode: User,
