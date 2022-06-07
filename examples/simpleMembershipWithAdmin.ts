@@ -78,23 +78,27 @@ export const simpleMembershipWithAdminSchema: Schema<typeof nodes[number]['node'
     ],
     rules: [
         {
+            kind: 'direct',
             node: Project,
             role: 'Stranger',
             actorNode: User,
         },
         {
+            kind: 'direct',
             node: Project,
             role: 'Owner',
             actorNode: User,
             throughRelation: 'owner',
         },
         {
+            kind: 'direct',
             node: Membership,
             role: 'Member',
             actorNode: User,
             throughRelation: 'user',
         },
         {
+            kind: 'extension',
             node: Project,
             role: 'Member',
             actorNode: User,
@@ -105,6 +109,7 @@ export const simpleMembershipWithAdminSchema: Schema<typeof nodes[number]['node'
             },
         },
         {
+            kind: 'direct',
             node: Project,
             role: 'Admin',
             actorNode: User,

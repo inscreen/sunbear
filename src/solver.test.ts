@@ -10,6 +10,7 @@ describe('solver', () => {
                 actorId: undefined,
                 goalIds: undefined,
                 direct: {
+                    kind: 'direct',
                     actorNode: Person,
                     node: Car,
                     role: 'Stranger',
@@ -20,6 +21,7 @@ describe('solver', () => {
                 actorId: undefined,
                 goalIds: undefined,
                 direct: {
+                    kind: 'direct',
                     actorNode: Person,
                     node: Car,
                     role: 'Owner',
@@ -54,6 +56,7 @@ describe('solver', () => {
                 actorId: undefined,
                 goalIds: undefined,
                 direct: {
+                    kind: 'direct',
                     node: Membership,
                     role: 'Member',
                     actorNode: User,
@@ -61,6 +64,7 @@ describe('solver', () => {
                 },
                 extensions: [
                     {
+                        kind: 'extension',
                         node: Project,
                         role: 'Member',
                         actorNode: User,
@@ -76,6 +80,7 @@ describe('solver', () => {
                 actorId: undefined,
                 goalIds: undefined,
                 direct: {
+                    kind: 'direct',
                     node: Project,
                     role: 'Owner',
                     actorNode: User,
@@ -106,6 +111,7 @@ describe('solver', () => {
                 actorId: 'user15',
                 goalIds: ['project1'],
                 direct: {
+                    kind: 'direct',
                     node: Membership,
                     role: 'Member',
                     actorNode: User,
@@ -113,6 +119,7 @@ describe('solver', () => {
                 },
                 extensions: [
                     {
+                        kind: 'extension',
                         node: Project,
                         role: 'Member',
                         actorNode: User,
@@ -128,6 +135,7 @@ describe('solver', () => {
                 actorId: 'user15',
                 goalIds: ['project1'],
                 direct: {
+                    kind: 'direct',
                     node: Project,
                     role: 'Owner',
                     actorNode: User,

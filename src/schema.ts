@@ -48,22 +48,38 @@ export function evaluateFilter(object: any, filter: RuleFilter): 'pass' | 'fail'
 }
 
 export interface RuleDirect<Node, Relation, Role> {
+    kind: 'direct';
     node: Node;
     filters?: readonly RuleFilter[];
     role: Role;
     actorNode: Node;
     actorFilters?: readonly RuleFilter[];
     throughRelation?: Relation;
-    extend?: never;
+    ofRole?: undefined;
+    extend?: undefined;
 }
 
-export interface RuleExtension<Node, Relation, Role> {
+export interface RuleSuperset<Node, Role> {
+    kind: 'superset';
     node: Node;
     filters?: readonly RuleFilter[];
     role: Role;
     actorNode: Node;
     actorFilters?: readonly RuleFilter[];
-    throughRelation?: never;
+    throughRelation?: undefined;
+    ofRole: Role;
+    extend?: undefined;
+}
+
+export interface RuleExtension<Node, Relation, Role> {
+    kind: 'extension';
+    node: Node;
+    filters?: readonly RuleFilter[];
+    role: Role;
+    actorNode: Node;
+    actorFilters?: readonly RuleFilter[];
+    throughRelation?: undefined;
+    ofRole?: undefined;
     extend: {
         linkNode: Node;
         linkFilters?: readonly RuleFilter[];
@@ -72,7 +88,10 @@ export interface RuleExtension<Node, Relation, Role> {
     };
 }
 
-export type Rule<Node, Relation, Role> = RuleDirect<Node, Relation, Role> | RuleExtension<Node, Relation, Role>;
+export type Rule<Node, Relation, Role> =
+    | RuleDirect<Node, Relation, Role>
+    | RuleSuperset<Node, Role>
+    | RuleExtension<Node, Relation, Role>;
 
 export interface Schema<Node, Relation, Role, Permission extends string> {
     nodes: readonly { node: Node; tableName: string; primaryColumn: string }[];
@@ -84,6 +103,6 @@ export interface Schema<Node, Relation, Role, Permission extends string> {
 // export function getEdge<Node, Relation, Role, Permission extends string, Left extends Node, Right extends Node>(
 //     schema: Schema<Node, Relation, Role, Permission>,
 //     left: Left,
-//     rigth: Right,
+//     right: Right,
 //     leftRelation: string,
 // ) {}
