@@ -2,10 +2,12 @@ export interface Edge<Node, Relation> {
     kind: '1:1' | '1:n' | 'n:1' | 'n:n';
     source: Node;
     sourceColumn: string;
+    /** Set to #this for a self-referencing relation. */
     sourcePreloadedProperty?: string;
     sourceRelation?: Relation;
     target: Node;
     targetColumn: string;
+    /** Set to #this for a self-referencing relation. */
     targetPreloadedProperty?: string;
     targetRelation?: Relation;
 }

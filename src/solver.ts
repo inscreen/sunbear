@@ -173,15 +173,15 @@ function evaluateSolution<Node extends AnyClass, Relation, Role, Permission exte
             edge.source === rule.node
                 ? [edge.sourcePreloadedProperty, ['n:1', 'n:n'].includes(edge.kind)]
                 : [edge.targetPreloadedProperty, ['1:n', 'n:n'].includes(edge.kind)];
-        if (
-            objectPreloadedProperty === undefined ||
-            object[objectPreloadedProperty] === undefined ||
-            object[objectPreloadedProperty] === null
-        ) {
+        if (objectPreloadedProperty === undefined) {
+            return false;
+        }
+        const preloadedValue = getPreloadedValue(object, objectPreloadedProperty);
+        if (preloadedValue === undefined || preloadedValue === null) {
             return false;
         }
 
-        const preloadedLinks: unknown[] = isArray ? object[objectPreloadedProperty] : [object[objectPreloadedProperty]];
+        const preloadedLinks: unknown[] = isArray ? preloadedValue : [preloadedValue];
         const modifiedChain: SolutionChain<Node, Relation, Role> = {
             ...chain,
             extensions: chain.extensions.slice(0, -1),
@@ -197,4 +197,13 @@ function evaluateSolution<Node extends AnyClass, Relation, Role, Permission exte
         }
     }
     return true;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function getPreloadedValue(object: any, objectPreloadedProperty: string): any {
+    if (objectPreloadedProperty === '#this') {
+        return object;
+    } else {
+        return object[objectPreloadedProperty];
+    }
 }
