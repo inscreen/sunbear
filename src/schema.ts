@@ -1,4 +1,3 @@
-// TODO: Once TS 4.7 is out, check if sourceColumn can be keyof source with in/out generics.
 export interface Edge<Node, Relation> {
     kind: '1:1' | '1:n' | 'n:1' | 'n:n';
     source: Node;
