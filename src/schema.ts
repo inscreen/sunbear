@@ -88,16 +88,30 @@ export interface RuleExtension<Node, Relation, Role> {
     };
 }
 
+export type NodeDefinition<Node> = {
+    node: Node;
+    tableName: string;
+    primaryColumn: string;
+    defaultFilters?: readonly RuleFilter[];
+};
+
 export type Rule<Node, Relation, Role> =
     | RuleDirect<Node, Relation, Role>
     | RuleSuperset<Node, Role>
     | RuleExtension<Node, Relation, Role>;
 
 export interface Schema<Node, Relation, Role, Permission extends string> {
-    nodes: readonly { node: Node; tableName: string; primaryColumn: string }[];
+    nodes: readonly NodeDefinition<Node>[];
     grants: Map<Node, Partial<Record<Permission, Role[]>>>;
     edges: readonly Edge<Node, Relation>[];
     rules: readonly Rule<Node, Relation, Role>[];
+}
+
+export function getNodeDefinition<Node, Relation, Role, Permission extends string>(
+    schema: Schema<Node, Relation, Role, Permission>,
+    node: Node,
+): NodeDefinition<Node> {
+    return schema.nodes.find((nodeDefinition) => nodeDefinition.node === node)!;
 }
 
 // export function getEdge<Node, Relation, Role, Permission extends string, Left extends Node, Right extends Node>(

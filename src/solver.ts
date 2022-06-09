@@ -1,7 +1,6 @@
-import { evaluateFilter, RuleDirect, RuleExtension } from './schema';
 import type { AnyClass } from './SunBear';
 
-import type { Schema } from '.';
+import { evaluateFilter, getNodeDefinition, RuleDirect, RuleExtension, Schema } from '.';
 
 export type SolutionChain<Node, Relation, Role> = {
     actorId: string | number | undefined;
@@ -75,7 +74,7 @@ export function solveByPermission<
     goalNode: Goal,
     goals: InstanceType<Goal>[] | undefined,
 ): true | Solution<Node, Relation, Role, Goal> {
-    const goalPrimaryColumn = schema.nodes.find((node) => node.node === goalNode)!.primaryColumn;
+    const goalPrimaryColumn = getNodeDefinition(schema, goalNode).primaryColumn;
     const goalIds: (string | number)[] | undefined = goals?.map((goal) => goal[goalPrimaryColumn]);
     const chains = (schema.grants.get(goalNode)?.[permission] ?? []).flatMap((role) =>
         solveByRole(schema, actorNode, actor, role, goalNode).map((chain) => ({ ...chain, goalIds })),
@@ -106,8 +105,7 @@ function solveByRole<
     role: Role,
     goalNode: Goal,
 ): Solution<Node, Relation, Role, Goal> {
-    const actorId: string | number | undefined =
-        actor?.[schema.nodes.find((node) => node.node === actorNode)!.primaryColumn];
+    const actorId: string | number | undefined = actor?.[getNodeDefinition(schema, actorNode).primaryColumn];
     return schema.rules
         .filter((rule) => {
             return rule.node === goalNode && rule.role === role && rule.actorNode === actorNode;

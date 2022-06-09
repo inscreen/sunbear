@@ -48,6 +48,22 @@ export class SunBear<
         return (await this.driver.run(query)).length > 0;
     }
 
+    /** This function behaves _exactly_ the same way as isAuthorized, but returns a different value for sync success vs async success.
+     * It can be used for logging and monitoring of requests that are expected to be resolved synchronously.
+     */
+    async isAuthorizedSync<Actor extends Node, Goal extends Node>(
+        actor: InstanceType<Actor>,
+        permission: Permission,
+        goal: InstanceType<Goal>,
+    ): Promise<{ success: boolean; sync: boolean }> {
+        const solution = solveByPermission(this.schema, actor.constructor, actor, permission, goal.constructor, [goal]);
+        if (solution === true) {
+            return { success: true, sync: true };
+        }
+        const query = this.driver.emit(planQuery(this.schema, solution));
+        return { success: (await this.driver.run(query)).length > 0, sync: false };
+    }
+
     authorizedQuery<Actor extends Node, Goal extends Node>(
         actor: InstanceType<Actor>,
         permission: Permission,

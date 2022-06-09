@@ -1,5 +1,6 @@
 import type { Solution, SolutionChain } from './solver';
 
+import { getNodeDefinition } from '.';
 import type { RuleFilter, Schema } from '.';
 
 export interface PlannedQueryCrossJoin<Node> {
@@ -47,18 +48,20 @@ export function planRuleChain<Node, Relation, Role, Permission extends string, G
     chain: SolutionChain<Node, Relation, Role>,
 ): PlannedQueryLinear<Node, Goal> {
     const goalRule = chain.extensions.length === 0 ? chain.direct : chain.extensions[chain.extensions.length - 1]!;
-    const goalFilters = [...(goalRule.filters ?? [])];
+    const goalNodeDefinition = getNodeDefinition(schema, goalRule.node);
+    const goalFilters = [...(goalNodeDefinition.defaultFilters ?? []), ...(goalRule.filters ?? [])];
     if (chain.goalIds) {
         goalFilters.push({
-            column: schema.nodes.find((node) => node.node === goalRule.node)!.primaryColumn,
+            column: goalNodeDefinition.primaryColumn,
             condition: { kind: 'IN', values: chain.goalIds },
         });
     }
 
-    let actorFilters = [...(goalRule.actorFilters ?? [])];
+    const actorNodeDefinition = getNodeDefinition(schema, goalRule.actorNode);
+    let actorFilters = [...(actorNodeDefinition.defaultFilters ?? []), ...(goalRule.actorFilters ?? [])];
     if (chain.actorId !== undefined) {
         actorFilters.push({
-            column: schema.nodes.find((node) => node.node === goalRule.actorNode)!.primaryColumn,
+            column: actorNodeDefinition.primaryColumn,
             condition: { kind: '=', value: chain.actorId },
         });
     }
@@ -67,6 +70,7 @@ export function planRuleChain<Node, Relation, Role, Permission extends string, G
     // Starting with the rule after the goal rule, which is dealt with separately.
     for (let idx = chain.extensions.length - 2; idx >= -1; idx--) {
         const rule = idx === -1 ? chain.direct : chain.extensions[idx]!;
+        const ruleNodeDefinition = getNodeDefinition(schema, rule.node);
         const previousRule = chain.extensions[idx + 1]!;
         if (rule.actorFilters !== undefined && rule.actorFilters.length > 0) {
             actorFilters = actorFilters.concat(rule.actorFilters);
@@ -89,7 +93,11 @@ export function planRuleChain<Node, Relation, Role, Permission extends string, G
             joinedTableColumn,
             existingTableName: idx === chain.extensions.length - 2 ? '__goal' : `__t${idx + 2}`,
             existingTableColumn,
-            filters: [...(rule.filters ?? []), ...(previousRule.extend.linkFilters ?? [])],
+            filters: [
+                ...(ruleNodeDefinition.defaultFilters ?? []),
+                ...(rule.filters ?? []),
+                ...(previousRule.extend.linkFilters ?? []),
+            ],
         });
     }
 

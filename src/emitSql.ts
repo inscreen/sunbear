@@ -2,7 +2,7 @@ import format from 'pg-format';
 
 import type { PlannedQuery, PlannedQueryJoin, PlannedQueryLinear } from './queryPlan';
 
-import type { RuleFilter, Schema } from '.';
+import { getNodeDefinition, RuleFilter, Schema } from '.';
 
 export function emitSql<Node, Relation, Role, Permission extends string, Goal extends Node>(
     schema: Schema<Node, Relation, Role, Permission>,
@@ -17,7 +17,7 @@ function emitLinear<Node, Relation, Role, Permission extends string, Goal extend
     linear: PlannedQueryLinear<Node, Goal>,
     select: string | string[] = '*',
 ): string {
-    const sqlTableName = schema.nodes.find(({ node }) => node === linear.goalTable)!.tableName;
+    const sqlTableName = getNodeDefinition(schema, linear.goalTable).tableName;
     const goalFilters = linear.goalFilters.map((filter) => emitFilter('__goal', filter));
     const joins = linear.joins.map((join) => emitJoin(schema, join));
     const allFilters = goalFilters.concat(joins.flatMap(({ filters }) => filters));
@@ -39,7 +39,7 @@ function emitJoin<Node, Relation, Role, Permission extends string>(
     schema: Schema<Node, Relation, Role, Permission>,
     join: PlannedQueryJoin<Node>,
 ): { join: string; filters: string[] } {
-    const sqlTableName = schema.nodes.find(({ node }) => node === join.joinedTable)!.tableName;
+    const sqlTableName = getNodeDefinition(schema, join.joinedTable).tableName;
 
     if (join.kind === 'inner') {
         return {

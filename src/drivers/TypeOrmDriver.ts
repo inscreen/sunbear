@@ -1,7 +1,7 @@
 import format from 'pg-format';
 import type { BaseEntity, Connection, ObjectType, SelectQueryBuilder } from 'typeorm';
 
-import type { Schema } from '..';
+import { getNodeDefinition, Schema } from '..';
 import type { Driver } from '../Driver';
 import { emitSql } from '../emitSql';
 import type { PlannedQuery } from '../queryPlan';
@@ -26,9 +26,7 @@ export class TypeOrmDriver<
     }
 
     emit<Goal extends Node>(query: PlannedQuery<Node, Goal>): SelectQueryBuilder<Goal> {
-        const goalPrimaryColumn = this.schema.nodes.find(
-            (node) => node.node === query.alternatives[0]!.goalTable,
-        )!.primaryColumn;
+        const goalPrimaryColumn = getNodeDefinition(this.schema, query.alternatives[0]!.goalTable).primaryColumn;
         return this.dataSource
             .createQueryBuilder(query.alternatives[0]!.goalTable, 'goal')
             .where(`goal.${format.ident(goalPrimaryColumn)} IN (${emitSql(this.schema, query, goalPrimaryColumn)})`);
