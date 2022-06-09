@@ -30,9 +30,9 @@ function emitLinear<Node, Relation, Role, Permission extends string, Goal extend
                   .split(',')
                   .map((c) => `__goal.${c}`)
                   .join(', ');
-    return `(SELECT ${selectColumns} FROM ${format.ident(sqlTableName)} __goal${joins.map(
-        ({ join }) => ` ${join}`,
-    )}${where})`;
+    return `(SELECT ${selectColumns} FROM ${format.ident(sqlTableName)} __goal${joins
+        .map(({ join }) => ` ${join}`)
+        .join('')}${where})`;
 }
 
 function emitJoin<Node, Relation, Role, Permission extends string>(
