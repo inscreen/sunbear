@@ -74,7 +74,11 @@ function emitFilter(tableName: string, filter: RuleFilter): string {
             return `${leftSide} ${filter.condition.kind} ${format.literal(filter.condition.value)}`;
         }
         case 'IN': {
-            return `${leftSide} IN (${format.literal(filter.condition.values)})`;
+            if (filter.condition.values.length > 0) {
+                return `${leftSide} IN (${format.literal(filter.condition.values)})`;
+            } else {
+                return '0 = 1';
+            }
         }
     }
 }
