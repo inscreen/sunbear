@@ -22,31 +22,32 @@ export interface PlannedQueryInnerJoin<Node> {
 
 export type PlannedQueryJoin<Node> = PlannedQueryInnerJoin<Node> | PlannedQueryCrossJoin<Node>;
 
-export interface PlannedQueryLinear<Node, Goal extends Node> {
+export interface PlannedQueryLinear<Node, Goal extends Node, Actor extends Node> {
     goalTable: Goal;
+    actorTable: Actor;
     goalFilters: readonly RuleFilter[];
     joins: readonly PlannedQueryJoin<Node>[];
 }
 
-export interface PlannedQueryUnion<Node, Goal extends Node> {
-    alternatives: readonly PlannedQueryLinear<Node, Goal>[];
+export interface PlannedQueryUnion<Node, Goal extends Node, Actor extends Node> {
+    alternatives: readonly PlannedQueryLinear<Node, Goal, Actor>[];
 }
 
-export type PlannedQuery<Node, Goal extends Node> = PlannedQueryUnion<Node, Goal>;
+export type PlannedQuery<Node, Goal extends Node, Actor extends Node> = PlannedQueryUnion<Node, Goal, Actor>;
 
-export function planQuery<Node, Relation, Role, Permission extends string, Goal extends Node>(
+export function planQuery<Node, Relation, Role, Permission extends string, Goal extends Node, Actor extends Node>(
     schema: Schema<Node, Relation, Role, Permission>,
     solutions: Solution<Node, Relation, Role, Goal>,
-): PlannedQuery<Node, Goal> {
+): PlannedQuery<Node, Goal, Actor> {
     return {
         alternatives: solutions.map((chain) => planRuleChain(schema, chain)),
     };
 }
 
-export function planRuleChain<Node, Relation, Role, Permission extends string, Goal extends Node>(
+export function planRuleChain<Node, Relation, Role, Permission extends string, Goal extends Node, Actor extends Node>(
     schema: Schema<Node, Relation, Role, Permission>,
     chain: SolutionChain<Node, Relation, Role>,
-): PlannedQueryLinear<Node, Goal> {
+): PlannedQueryLinear<Node, Goal, Actor> {
     const goalRule = chain.extensions.length === 0 ? chain.direct : chain.extensions[chain.extensions.length - 1]!;
     const goalNodeDefinition = getNodeDefinition(schema, goalRule.node);
     const goalFilters = [...(goalNodeDefinition.defaultFilters ?? []), ...(goalRule.filters ?? [])];
@@ -136,6 +137,7 @@ export function planRuleChain<Node, Relation, Role, Permission extends string, G
 
     return {
         goalTable: goalRule.node as Goal,
+        actorTable: rule.actorNode as Actor,
         goalFilters,
         joins,
     };

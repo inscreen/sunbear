@@ -11,8 +11,12 @@ export class PostgresDriver<Node, Relation, Role, Permission extends string> imp
         protected readonly client: Client | Pool,
     ) {}
 
-    emit<Goal extends Node>(query: PlannedQuery<Node, Goal>): string {
-        return emitSql(this.schema, query);
+    emitGoalsQuery<Goal extends Node, Actor extends Node>(query: PlannedQuery<Node, Goal, Actor>): string {
+        return emitSql(this.schema, query, 'goal');
+    }
+
+    emitActorsQuery<Goal extends Node, Actor extends Node>(query: PlannedQuery<Node, Goal, Actor>): string {
+        return emitSql(this.schema, query, 'actor');
     }
 
     async run<Goal extends Node>(query: string): Promise<Goal[]> {

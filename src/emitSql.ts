@@ -4,17 +4,19 @@ import type { PlannedQuery, PlannedQueryJoin, PlannedQueryLinear } from './query
 
 import { getNodeDefinition, RuleFilter, Schema } from '.';
 
-export function emitSql<Node, Relation, Role, Permission extends string, Goal extends Node>(
+export function emitSql<Node, Relation, Role, Permission extends string, Goal extends Node, Actor extends Node>(
     schema: Schema<Node, Relation, Role, Permission>,
-    query: PlannedQuery<Node, Goal>,
+    query: PlannedQuery<Node, Goal, Actor>,
+    selectTable: 'goal' | 'actor',
     select: string | string[] = '*',
 ): string {
-    return query.alternatives.map((linear) => emitLinear(schema, linear, select)).join(' UNION ');
+    return query.alternatives.map((linear) => emitLinear(schema, linear, selectTable, select)).join(' UNION ');
 }
 
-function emitLinear<Node, Relation, Role, Permission extends string, Goal extends Node>(
+function emitLinear<Node, Relation, Role, Permission extends string, Goal extends Node, Actor extends Node>(
     schema: Schema<Node, Relation, Role, Permission>,
-    linear: PlannedQueryLinear<Node, Goal>,
+    linear: PlannedQueryLinear<Node, Goal, Actor>,
+    selectTable: 'goal' | 'actor',
     select: string | string[] = '*',
 ): string {
     const sqlTableName = getNodeDefinition(schema, linear.goalTable).tableName;
@@ -24,11 +26,11 @@ function emitLinear<Node, Relation, Role, Permission extends string, Goal extend
     const where = allFilters.length === 0 ? '' : ` WHERE ${allFilters.join(' AND ')}`;
     const selectColumns =
         select === '*'
-            ? '__goal.*'
+            ? `__${selectTable}.*`
             : format
                   .ident(select)
                   .split(',')
-                  .map((c) => `__goal.${c}`)
+                  .map((c) => `__${selectTable}.${c}`)
                   .join(', ');
     return `(SELECT ${selectColumns} FROM ${format.ident(sqlTableName)} __goal${joins
         .map(({ join }) => ` ${join}`)

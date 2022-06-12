@@ -44,7 +44,7 @@ export class SunBear<
         if (solution === true) {
             return true;
         }
-        const query = this.driver.emit(planQuery(this.schema, solution));
+        const query = this.driver.emitGoalsQuery(planQuery(this.schema, solution));
         return (await this.driver.run(query)).length > 0;
     }
 
@@ -60,7 +60,7 @@ export class SunBear<
         if (solution === true) {
             return { success: true, sync: true };
         }
-        const query = this.driver.emit(planQuery(this.schema, solution));
+        const query = this.driver.emitGoalsQuery(planQuery(this.schema, solution));
         return { success: (await this.driver.run(query)).length > 0, sync: false };
     }
 
@@ -70,7 +70,7 @@ export class SunBear<
         goal: Goal,
     ): Query {
         const solution = solveByPermission(this.schema, actor.constructor, actor, permission, goal, undefined);
-        return this.driver.emit(planQuery(this.schema, solution));
+        return this.driver.emitGoalsQuery(planQuery(this.schema, solution));
     }
 
     authorizedActorsQuery<Actor extends Node, Goal extends Node>(
@@ -79,6 +79,6 @@ export class SunBear<
         goal: InstanceType<Goal>,
     ): Query {
         const solution = solveByPermission(this.schema, actor, undefined, permission, goal.constructor, [goal]);
-        return this.driver.emit(planQuery(this.schema, solution));
+        return this.driver.emitActorsQuery(planQuery(this.schema, solution));
     }
 }

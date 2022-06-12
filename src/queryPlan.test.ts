@@ -35,11 +35,13 @@ describe('queryPlan', () => {
             alternatives: [
                 {
                     goalTable: Car,
+                    actorTable: Person,
                     goalFilters: [{ column: 'id', condition: { kind: 'IN', values: ['car1', 'car2'] } }],
                     joins: [],
                 },
                 {
                     goalTable: Car,
+                    actorTable: Person,
                     goalFilters: [],
                     joins: [
                         {
@@ -101,6 +103,7 @@ describe('queryPlan', () => {
             alternatives: [
                 {
                     goalTable: Project,
+                    actorTable: User,
                     goalFilters: [],
                     joins: [
                         {
@@ -130,6 +133,7 @@ describe('queryPlan', () => {
                 },
                 {
                     goalTable: Project,
+                    actorTable: User,
                     goalFilters: [],
                     joins: [
                         {
