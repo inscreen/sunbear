@@ -12,7 +12,9 @@ describe('solver', () => {
                 direct: {
                     kind: 'direct',
                     actorNode: Person,
+                    actorFilters: [],
                     node: Car,
+                    filters: [],
                     role: 'Stranger',
                 },
                 extensions: [],
@@ -23,8 +25,10 @@ describe('solver', () => {
                 direct: {
                     kind: 'direct',
                     actorNode: Person,
+                    actorFilters: [],
                     node: Car,
                     role: 'Owner',
+                    filters: [],
                     throughRelation: 'owner',
                 },
                 extensions: [],
@@ -58,16 +62,20 @@ describe('solver', () => {
                 direct: {
                     kind: 'direct',
                     node: Membership,
+                    filters: [],
                     role: 'Member',
                     actorNode: User,
+                    actorFilters: [],
                     throughRelation: 'user',
                 },
                 extensions: [
                     {
                         kind: 'extension',
                         node: Project,
+                        filters: [],
                         role: 'Member',
                         actorNode: User,
+                        actorFilters: [],
                         extend: {
                             linkNode: Membership,
                             linkRole: 'Member',
@@ -82,8 +90,10 @@ describe('solver', () => {
                 direct: {
                     kind: 'direct',
                     node: Project,
+                    filters: [],
                     role: 'Owner',
                     actorNode: User,
+                    actorFilters: [],
                     throughRelation: 'owner',
                 },
                 extensions: [],
@@ -113,16 +123,20 @@ describe('solver', () => {
                 direct: {
                     kind: 'direct',
                     node: Membership,
+                    filters: [],
                     role: 'Member',
                     actorNode: User,
+                    actorFilters: [],
                     throughRelation: 'user',
                 },
                 extensions: [
                     {
                         kind: 'extension',
                         node: Project,
+                        filters: [],
                         role: 'Member',
                         actorNode: User,
+                        actorFilters: [],
                         extend: {
                             linkNode: Membership,
                             linkRole: 'Member',
@@ -137,8 +151,10 @@ describe('solver', () => {
                 direct: {
                     kind: 'direct',
                     node: Project,
+                    filters: [],
                     role: 'Owner',
                     actorNode: User,
+                    actorFilters: [],
                     throughRelation: 'owner',
                 },
                 extensions: [],

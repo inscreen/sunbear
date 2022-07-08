@@ -1,6 +1,6 @@
 import type { AnyClass } from './SunBear';
 
-import { evaluateFilter, getNodeDefinition, RuleDirect, RuleExtension, Schema } from '.';
+import { evaluateFilter, getNodeDefinition, RuleDirect, RuleExtension, RuleFilter, Schema } from '.';
 
 export type SolutionChain<Node, Relation, Role> = {
     actorId: string | number | undefined;
@@ -104,6 +104,7 @@ function solveByRole<
     actor: InstanceType<Actor> | undefined,
     role: Role,
     goalNode: Goal,
+    carry?: { filters?: readonly RuleFilter[]; actorFilters?: readonly RuleFilter[] },
 ): Solution<Node, Relation, Role, Goal> {
     const actorId: string | number | undefined = actor?.[getNodeDefinition(schema, actorNode).primaryColumn];
     return schema.rules
@@ -115,23 +116,35 @@ function solveByRole<
                 // Actor filters are known to fail, there's no need to bother testing in the database.
                 return [];
             }
-            switch (rule.kind) {
+            const ruleWithCarry = {
+                ...rule,
+                filters: (carry?.filters ?? []).concat(rule.filters ?? []),
+                actorFilters: (carry?.actorFilters ?? []).concat(rule.actorFilters ?? []),
+            };
+            switch (ruleWithCarry.kind) {
                 case 'direct': {
                     // Only one way to satisfy this rule: a chain including only this rule.
-                    return [{ actorId, goalIds: undefined, direct: rule, extensions: [] }];
+                    return [{ actorId, goalIds: undefined, direct: ruleWithCarry, extensions: [] }];
                 }
                 case 'superset': {
                     // This rule can be satisfied by proving any possible solution for the subset role.
-                    return solveByRole(schema, actorNode, actor, rule.ofRole, goalNode);
+                    return solveByRole(schema, actorNode, actor, ruleWithCarry.ofRole, goalNode, {
+                        filters: ruleWithCarry.filters,
+                        actorFilters: ruleWithCarry.actorFilters,
+                    });
                 }
                 case 'extension': {
                     // This rule can be satisfied by proving any possible solution for the tail and then proving the head of the rule.
-                    return solveByRole(schema, actorNode, actor, rule.extend.linkRole, rule.extend.linkNode).map(
-                        (chain) => ({
-                            ...chain,
-                            extensions: [...chain.extensions, rule],
-                        }),
-                    );
+                    return solveByRole(
+                        schema,
+                        actorNode,
+                        actor,
+                        ruleWithCarry.extend.linkRole,
+                        ruleWithCarry.extend.linkNode,
+                    ).map((chain) => ({
+                        ...chain,
+                        extensions: [...chain.extensions, ruleWithCarry],
+                    }));
                 }
             }
         });
