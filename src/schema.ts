@@ -1,5 +1,4 @@
 export interface Edge<Node, Relation> {
-    kind: '1:1' | '1:n' | 'n:1' | 'n:n';
     source: Node;
     sourceColumn: string;
     /** Set to #this for a self-referencing relation. */
@@ -120,3 +119,98 @@ export function getNodeDefinition<Node, Relation, Role, Permission extends strin
 //     right: Right,
 //     leftRelation: string,
 // ) {}
+
+export class SchemaBuilder<Node, Relation, Role extends string, Permission extends string> {
+    grants = new Map<Node, Partial<Record<Permission, Role[]>>>();
+    rules: Rule<Node, Relation, Role>[] = [];
+
+    constructor(public nodes: readonly NodeDefinition<Node>[], public edges: readonly Edge<Node, Relation>[]) {}
+
+    finalize(): Schema<Node, Relation, Role, Permission> {
+        return {
+            nodes: this.nodes,
+            grants: this.grants,
+            edges: this.edges,
+            rules: this.rules,
+        };
+    }
+
+    grant(node: Node, role: Role, permission: Permission): this;
+    grant(node: Node, role: Role, permissions: readonly Permission[]): this;
+    grant(node: Node, roles: readonly Role[], permission: Permission): this;
+    grant(node: Node, roles: Role | readonly Role[], permissions: Permission | readonly Permission[]): this {
+        let grant = this.grants.get(node);
+        if (!grant) {
+            grant = {};
+            this.grants.set(node, grant);
+        }
+        for (const permission of [permissions as Permission[]].flat()) {
+            let grantees = grant[permission];
+            if (!grantees) {
+                grantees = [];
+                grant[permission] = grantees;
+            }
+            for (const role of [roles as Role[]].flat()) {
+                if (!grantees.includes(role)) {
+                    grantees.push(role);
+                }
+            }
+        }
+        return this;
+    }
+
+    assignDirectly(
+        node: Node,
+        filters: readonly RuleFilter[],
+        actorNode: Node,
+        actorFilters: readonly RuleFilter[],
+        role: Role,
+    ): this {
+        this.rules.push({ kind: 'direct', node, filters, role, actorNode, actorFilters });
+        return this;
+    }
+
+    assignThroughRelation(
+        node: Node,
+        filters: readonly RuleFilter[],
+        throughRelation: Relation,
+        actorNode: Node,
+        actorFilters: readonly RuleFilter[],
+        role: Role,
+    ): this {
+        this.rules.push({ kind: 'direct', node, filters, role, actorNode, actorFilters, throughRelation });
+        return this;
+    }
+
+    assignByExtension(
+        node: Node,
+        filters: readonly RuleFilter[],
+        actorNode: Node,
+        actorFilters: readonly RuleFilter[],
+        role: Role,
+        extend: RuleExtension<Node, Relation, Role>['extend'],
+    ): this {
+        this.rules.push({
+            kind: 'extension',
+            node,
+            filters,
+            role,
+            actorNode,
+            actorFilters,
+            extend,
+        });
+        return this;
+    }
+
+    assignByOtherRole(
+        node: Node,
+        filters: readonly RuleFilter[],
+        otherRole: Role,
+        actorNode: Node,
+        actorFilters: readonly RuleFilter[],
+        role: Role,
+    ): this {
+        this.rules.push({ kind: 'superset', node, filters, role, actorNode, actorFilters, ofRole: otherRole });
+        return this;
+    }
+}

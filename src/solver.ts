@@ -191,9 +191,7 @@ function evaluateSolution<Node extends AnyClass, Relation, Role, Permission exte
                     edge.sourceRelation === rule.extend.throughRelation),
         )!;
         const [objectPreloadedProperty, isArray] =
-            edge.source === rule.node
-                ? [edge.sourcePreloadedProperty, ['n:1', 'n:n'].includes(edge.kind)]
-                : [edge.targetPreloadedProperty, ['1:n', 'n:n'].includes(edge.kind)];
+            edge.source === rule.node ? [edge.sourcePreloadedProperty, false] : [edge.targetPreloadedProperty, true];
         if (objectPreloadedProperty === undefined) {
             return false;
         }
