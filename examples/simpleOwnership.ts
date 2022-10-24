@@ -1,4 +1,4 @@
-import type { Schema } from '../src';
+import { Schema, SchemaBuilder } from '../src';
 
 export class Person {
     constructor(public id: string) {}
@@ -13,47 +13,27 @@ const nodes = [
     { node: Car, tableName: 'cars', primaryColumn: 'id' },
 ] as const;
 
+const edges = [
+    {
+        source: Car,
+        sourceColumn: 'owner_id',
+        sourcePreloadedProperty: 'owner',
+        sourceRelation: 'owner',
+        target: Person,
+        targetColumn: 'id',
+    },
+] as const;
+
 type Relation = 'owner';
 
 type Role = 'Stranger' | 'Owner';
 
 type Permission = 'view' | 'drive';
 
-export const simpleOwnershipSchema: Schema<typeof nodes[number]['node'], Relation, Role, Permission> = {
-    nodes,
-    grants: new Map([
-        [
-            Car,
-            {
-                view: ['Stranger', 'Owner'],
-                drive: ['Owner'],
-            },
-        ],
-    ]),
-    edges: [
-        {
-            kind: '1:n',
-            source: Car,
-            sourceColumn: 'owner_id',
-            sourcePreloadedProperty: 'owner',
-            sourceRelation: 'owner',
-            target: Person,
-            targetColumn: 'id',
-        },
-    ],
-    rules: [
-        {
-            kind: 'direct',
-            node: Car,
-            role: 'Stranger',
-            actorNode: Person,
-        },
-        {
-            kind: 'direct',
-            node: Car,
-            role: 'Owner',
-            actorNode: Person,
-            throughRelation: 'owner',
-        },
-    ],
-};
+export const simpleOwnershipSchema: Schema<typeof nodes[number]['node'], Relation, Role, Permission> =
+    new SchemaBuilder<typeof nodes[number]['node'], Relation, Role, Permission>(nodes, edges)
+        .grant(Car, 'Owner', ['view', 'drive'])
+        .grant(Car, 'Stranger', 'view')
+        .assignDirectly(Car, [], Person, [], 'Stranger')
+        .assignThroughRelation(Car, [], 'owner', Person, [], 'Owner')
+        .finalize();
