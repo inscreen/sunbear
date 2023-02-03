@@ -1,5 +1,5 @@
 import format from 'pg-format';
-import type { BaseEntity, Connection, ObjectType, SelectQueryBuilder } from 'typeorm';
+import type { BaseEntity, DataSource, ObjectType, SelectQueryBuilder } from 'typeorm';
 
 import { getNodeDefinition, Schema } from '..';
 import type { Driver } from '../Driver';
@@ -18,7 +18,7 @@ export class TypeOrmDriver<
 {
     constructor(
         private readonly schema: Schema<Node, Relation, Role, Permission>,
-        private readonly dataSource: Connection,
+        private readonly dataSource: DataSource,
     ) {
         if (!['postgres', 'aurora-postgres'].includes(dataSource.driver.options.type)) {
             throw new Error('SunBear: TypeOrmDriver only supports PostgreSQL');
